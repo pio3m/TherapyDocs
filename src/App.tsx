@@ -14,7 +14,7 @@ function App() {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     pesel: '',
-    sessions: 1,
+    sessions: 0,
     sessionDates: [''], // Tablica z datami sesji, początkowo pusta
     pricePerSession: 0, // Cena jednej sesji
   });
@@ -107,17 +107,17 @@ function App() {
 
             <div>
               <label htmlFor="sessions" className="block text-sm font-medium text-gray-700">
-                Liczba Sesji
+              Liczba Sesji
               </label>
               <input
-                type="number"
-                name="sessions"
-                id="sessions"
-                required
-                min="1"
-                value={formData.sessions}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+              type="number"
+              name="sessions"
+              id="sessions"
+              required
+              min="1"
+              value={formData.sessions || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
               />
             </div>
 
