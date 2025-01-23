@@ -146,18 +146,18 @@ function App() {
 
             <div>
               <label htmlFor="pricePerSession" className="block text-sm font-medium text-gray-700">
-                Cena Jednej Sesji (zł)
+              Cena Jednej Sesji (zł)
               </label>
               <input
-                type="number"
-                name="pricePerSession"
-                id="pricePerSession"
-                required
-                min="0"
-                step="0.01"
-                value={formData.pricePerSession}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+              type="number"
+              name="pricePerSession"
+              id="pricePerSession"
+              required
+              min="0"
+              step="0.01"
+              value={formData.pricePerSession || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
               />
             </div>
 
