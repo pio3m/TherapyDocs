@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Download } from 'lucide-react';
 import { generatePDF } from './pdfGenerator';
+import logo from './logo.png';
 
 interface FormData {
   fullName: string;
@@ -67,6 +68,7 @@ function App() {
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="px-8 py-6">
           <div className="flex items-center justify-center mb-6">
+            <img src={logo} alt="Logo" className="h-12 w-12" />
             <FileText className="h-12 w-12 text-indigo-600" />
           </div>
           <h2 className="text-center text-2xl font-bold text-gray-900 mb-8">

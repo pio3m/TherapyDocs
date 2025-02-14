@@ -33,20 +33,21 @@ export const generatePDF = (data: CertificateData) => {
   const newWidth = 60; // Ustalona szerokość
   const newHeight = newWidth / aspectRatio; // Oblicz wysokość na podstawie proporcji
 
-  doc.addImage(img, 'PNG', 20, 10, newWidth, newHeight);
+  doc.addImage(img, 'PNG', 70, 10, newWidth, newHeight);
 
   // Lokalizacja i data w prawym górnym rogu
   doc.setFontSize(10);
   doc.text('Płock, ' + currentDate, 180, 20, { align: 'right' });
 
-  // Nagłówek "ZAŚWIADCZENIE"
+  // Nagłówek "ZAŚWIADCZENIE" - bold i bez italica
   doc.setFontSize(16);
+  doc.setFont("Roboto", "bold"); // Ustawienie czcionki na bold
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
+  doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
 
   // Treść główna
   doc.setFontSize(12);
-  doc.setFont("Roboto", "normal");
-  const sessionDates = data.sessionDates.join(' - ');
+  const sessionDates = data.sessionDates.join(', '); // Wyrównanie dat sesji po przecinku
   const content = [
     `Niniejszym zaświadczam, iż ${data.fullName} (PESEL ${data.pesel}) uczestniczył w ${data.sessions} konsultacjach`,
     `psychoterapeutycznych w Centrum Obecności, w Płocku.`,
@@ -58,11 +59,12 @@ export const generatePDF = (data: CertificateData) => {
     "Zaświadczenie wydaje się na bezpośrednią prośbę " + (data.fullName.includes("Pan") ? "Pana " : "Pani ") + data.fullName
   ];
 
-  doc.text(content, 20, 80);
+  // Justowanie tekstu
+  doc.text(content, 20, 80, { align: "justify" }); // Justowanie tekstu
 
-  // Podpis terapeuty
+  // Podpis terapeuty i pieczęć ośrodka w tej samej linii
   doc.text("........................................", 105, 140, { align: "center" });
-  doc.text("Podpis i pieczęć terapeuty", 105, 150, { align: "center" });
+  doc.text("Podpis terapeuty Pieczęć ośrodka", 105, 150, { align: "center" }); // Zmiana tekstu
 
   // Zapisanie PDF
   doc.save(`zaswiadczenie_${data.fullName.replace(/\s+/g, '_')}.pdf`);
