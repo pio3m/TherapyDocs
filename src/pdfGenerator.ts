@@ -16,7 +16,7 @@ interface CertificateData {
   pricePerSession: number; // Cena jednej sesji.
 }
 
-export const generatePDF = (data: CertificateData) => {
+export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) => {
   const doc = new jsPDF();
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
@@ -51,7 +51,7 @@ export const generatePDF = (data: CertificateData) => {
   doc.setFontSize(12);
   const sessionDates = data.sessionDates.join(', '); // Wyrównanie dat sesji po przecinku
   const content = [
-    `Niniejszym zaświadczam, iż ${data.fullName} (PESEL ${data.pesel}) uczestniczył w ${data.sessions} konsultacjach`,
+    `Niniejszym zaświadczam, iż ${data.gender} ${data.fullName} (PESEL ${data.pesel}) uczestniczył w ${data.sessions} konsultacjach`,
     `psychoterapeutycznych w Centrum Obecności, w Płocku.`,
     "",
     `Sesje odbyły się w dniach: ${sessionDates}.`,

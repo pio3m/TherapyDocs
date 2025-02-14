@@ -9,6 +9,7 @@ interface FormData {
   sessions: number;
   sessionDates: string[];
   pricePerSession: number;
+  gender: 'Pan' | 'Pani';
 }
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
     sessions: 0,
     sessionDates: [''], // Tablica z datami sesji, początkowo pusta
     pricePerSession: 0, // Cena jednej sesji
+    gender: 'Pan', // Domyślnie ustawione na 'Pan'
   });
 
   // Obsługa przesłania formularza
@@ -159,6 +161,21 @@ function App() {
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Płeć
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+              >
+                <option value="Pan">Pan</option>
+                <option value="Pani">Pani</option>
+              </select>
             </div>
 
             <button
