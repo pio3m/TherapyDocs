@@ -4,9 +4,6 @@ import { pl } from 'date-fns/locale';
 
 import logo from './logo.png'; // Importuj lokalny plik PNG (np. logo.png).
 
-// Zaimportuj czcionkę
-import './roboto-normal.js'; // Plik wygenerowany przez fontconverter
-
 
 interface CertificateData {
   fullName: string;
@@ -20,11 +17,12 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
   const doc = new jsPDF();
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-
   // Dodanie niestandardowej czcionki
-  doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal'); // Zgodnie z nazwą w wygenerowanym pliku
-  doc.setFont('Roboto'); // Ustawienie czcionki jako aktywnej
+  doc.addFont('Roboto-Black.ttf', 'Roboto', 'normal'); // Zgodnie z nazwą w wygenerowanym pliku
+  doc.setFont('Roboto', 'normal'); // Ustawienie czcionki jako aktywnej
 
+  // Ustawienie czcionki na Roboto Black
+  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na Roboto Black
 
   // Dodanie logotypu
   const img = new Image();
@@ -43,7 +41,7 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
 
   // Nagłówek "ZAŚWIADCZENIE" - bold i bez italica
   doc.setFontSize(16);
-  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na bold
+  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na Roboto Black
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
   doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
 
