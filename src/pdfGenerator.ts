@@ -16,7 +16,7 @@ interface CertificateData {
 export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) => {
   const doc = new jsPDF();
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
-  doc.setFont("helvetica", "bold");
+  doc.setFont("DejaVuSans", "normal");
   // Dodanie logotypu
   const img = new Image();
   img.src = logo; // Lokalny plik wczytany dzięki Webpack/Vite.
