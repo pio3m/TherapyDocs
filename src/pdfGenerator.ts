@@ -16,12 +16,7 @@ interface CertificateData {
 export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) => {
   const doc = new jsPDF();
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
-
-  // Dodanie niestandardowej czcionki Roboto
-  doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal'); // Upewnij się, że plik czcionki jest dostępny
-  doc.addFont('Roboto-Black.ttf', 'Roboto', 'bold'); // Dodanie czcionki Roboto Black
-  doc.setFont('Roboto', 'normal'); // Ustawienie czcionki Roboto jako domyślnej
-
+  doc.setFont("helvetica", "bold");
   // Dodanie logotypu
   const img = new Image();
   img.src = logo; // Lokalny plik wczytany dzięki Webpack/Vite.
@@ -38,9 +33,7 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
   doc.text('Płock, ' + currentDate, 180, 20, { align: 'right' });
 
   doc.setFontSize(16);
-  doc.setFont("Roboto", "bold"); // Ustawienie czcionki na Roboto Black
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
-  doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
 
   // Treść główna
   doc.setFontSize(12);
