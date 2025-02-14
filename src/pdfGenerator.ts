@@ -35,7 +35,7 @@ export const generatePDF = (data: CertificateData) => {
 
   // Ustawienie zdjęcia centralnie nad tytułem
   const imgX = (doc.internal.pageSize.getWidth() - newWidth) / 2; // Obliczanie współrzędnej X dla centrowania
-  doc.addImage(img, 'PNG', imgX, 40, newWidth, newHeight); // Zmiana współrzędnej Y na 40
+  doc.addImage(img, 'PNG', imgX, 20, newWidth, newHeight); // Zmiana współrzędnej Y na 40
 
   // Lokalizacja i data w prawym górnym rogu
   doc.setFontSize(10);
@@ -43,7 +43,7 @@ export const generatePDF = (data: CertificateData) => {
 
   // Nagłówek "ZAŚWIADCZENIE" - bold i bez italica
   doc.setFontSize(16);
-  doc.setFont("Roboto", "bold"); // Ustawienie czcionki na bold
+  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na bold
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
   doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
 
