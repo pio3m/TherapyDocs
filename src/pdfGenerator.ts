@@ -33,7 +33,9 @@ export const generatePDF = (data: CertificateData) => {
   const newWidth = 60; // Ustalona szerokość
   const newHeight = newWidth / aspectRatio; // Oblicz wysokość na podstawie proporcji
 
-  doc.addImage(img, 'PNG', 70, 10, newWidth, newHeight);
+  // Ustawienie zdjęcia centralnie nad tytułem
+  const imgX = (doc.internal.pageSize.getWidth() - newWidth) / 2; // Obliczanie współrzędnej X dla centrowania
+  doc.addImage(img, 'PNG', imgX, 40, newWidth, newHeight); // Zmiana współrzędnej Y na 40
 
   // Lokalizacja i data w prawym górnym rogu
   doc.setFontSize(10);
