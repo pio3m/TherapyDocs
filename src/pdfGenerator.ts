@@ -41,7 +41,7 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
 
   // Nagłówek "ZAŚWIADCZENIE" - bold i bez italica
   doc.setFontSize(16);
-  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na Roboto Black
+  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na bold
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
   doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
 
