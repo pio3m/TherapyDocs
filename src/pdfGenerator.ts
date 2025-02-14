@@ -17,13 +17,6 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
   const doc = new jsPDF();
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-  // Dodanie niestandardowej czcionki
-  doc.addFont('Roboto-Black.ttf', 'Roboto', 'normal'); // Zgodnie z nazwą w wygenerowanym pliku
-  doc.setFont('Roboto', 'normal'); // Ustawienie czcionki jako aktywnej
-
-  // Ustawienie czcionki na Roboto Black
-  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na Roboto Black
-
   // Dodanie logotypu
   const img = new Image();
   img.src = logo; // Lokalny plik wczytany dzięki Webpack/Vite.
@@ -41,9 +34,9 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
 
   // Nagłówek "ZAŚWIADCZENIE" - bold i bez italica
   doc.setFontSize(16);
-  doc.setFont("Roboto", "normal"); // Ustawienie czcionki na bold
+
   doc.text("ZAŚWIADCZENIE", 105, 60, { align: "center" });
-  doc.setFont("Roboto", "normal"); // Przywrócenie normalnej czcionki
+  
 
   // Treść główna
   doc.setFontSize(12);
@@ -56,7 +49,7 @@ export const generatePDF = (data: CertificateData & { gender: 'Pan' | 'Pani' }) 
     `Ilość sesji odbytych: ${data.sessions}`,
     `Cena jednej sesji: ${data.pricePerSession} zł`,
     "",
-    "Zaświadczenie wydaje się na bezpośrednią prośbę " + (data.fullName.includes("Pan") ? "Pana " : "Pani ") + data.fullName
+    "Zaświadczenie wydaje się na bezpośrednią prośbę ${data.gender} ${data.fullName}"
   ];
 
   // Justowanie tekstu
