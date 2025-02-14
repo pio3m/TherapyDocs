@@ -69,12 +69,10 @@ function App() {
         <div className="px-8 py-6">
           <div className="flex items-center justify-center mb-6">
             <img src={logo} alt="Logo" className="h-12 w-12" />
-            <FileText className="h-12 w-12 text-indigo-600" />
           </div>
           <h2 className="text-center text-2xl font-bold text-gray-900 mb-8">
             Generator Zaświadczeń Terapeutycznych
           </h2>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">

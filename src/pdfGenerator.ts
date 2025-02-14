@@ -60,7 +60,7 @@ export const generatePDF = (data: CertificateData) => {
   ];
 
   // Justowanie tekstu
-  doc.text(content, 20, 80, { align: "justify" }); // Justowanie tekstu
+  doc.text(content, 20, 80, { align: "left" }); // Justowanie tekstu
 
   // Podpis terapeuty i pieczęć ośrodka w tej samej linii
   doc.text("........................................", 105, 140, { align: "center" });
