@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
-
+import "jspdf-fonts";
 import logo from './logo.png'; // Importuj lokalny plik PNG (np. logo.png).
 
 
