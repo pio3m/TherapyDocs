@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
 import robotoFont from './Roboto-Regular.ttf';
+import robotoBoldFont from './Roboto-Bold.ttf';
 import logo from './logo.png'; // Importuj jako statyczny plik Vite
 
 // **Funkcja do dynamicznego ładowania obrazów**
@@ -35,6 +36,10 @@ export const generatePDF = async (data: CertificateData) => {
   const fontBytes = await fetch(robotoFont).then(res => res.arrayBuffer());
   const customFont = await doc.embedFont(fontBytes);
 
+  // **Załadowanie pogrubionej czcionki**
+  const boldFontBytes = await fetch(robotoBoldFont).then(res => res.arrayBuffer());
+  const boldFont = await doc.embedFont(boldFontBytes);
+
   page.setFont(customFont);
   page.setFontSize(12);
 
@@ -43,7 +48,7 @@ export const generatePDF = async (data: CertificateData) => {
   const logoImage = await doc.embedPng(logoBytes);
 
   // **Skalowanie obrazu**
-  const imgWidth = 60;
+  const imgWidth = 260;
   const aspectRatio = logoImage.width / logoImage.height;
   const imgHeight = imgWidth / aspectRatio;
 
@@ -55,8 +60,8 @@ export const generatePDF = async (data: CertificateData) => {
   });
 
   // **Dodanie nagłówka i daty**
-  page.drawText(`Płock, ${currentDate}`, { x: 400, y: 810, size: 10, color: rgb(0, 0, 0) });
-  page.drawText('ZAŚWIADCZENIE', { x: 220, y: 750, size: 16, color: rgb(0, 0, 0) });
+  page.drawText(`Płock, ${currentDate}`, { x: 400, y: 850, size: 10, color: rgb(0, 0, 0) });
+  page.drawText('ZAŚWIADCZENIE', { x: 220, y: 800, size: 16, color: rgb(0, 0, 0), font: boldFont });
 
   // **Treść certyfikatu**
   const sessionDates = data.sessionDates.join(', ');
@@ -71,7 +76,7 @@ export const generatePDF = async (data: CertificateData) => {
     `Zaświadczenie wydaje się na bezpośrednią prośbę ${data.gender} ${data.fullName}.`
   ];
 
-  let y = 700;
+  let y = 740;
   content.forEach(line => {
     page.drawText(line, { x: 50, y, size: 12, color: rgb(0, 0, 0) });
     y -= 20;
