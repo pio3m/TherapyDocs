@@ -1,12 +1,19 @@
 import { PDFDocument, rgb } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit'; // Importujemy fontkit
+import fontkit from '@pdf-lib/fontkit';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
-import logoBase64 from './logo.png'; // Import obrazka jako Base64
-import robotoFont from './Roboto-Regular.ttf'; // Import czcionki
+import robotoFont from './Roboto-Regular.ttf';
+import logo from './logo.png'; // Importuj jako statyczny plik Vite
 
-// Interfejs danych
+// **Funkcja do dynamicznego ładowania obrazów**
+const loadImage = async (imagePath: string) => {
+  const response = await fetch(imagePath);
+  const imageBytes = await response.arrayBuffer();
+  return imageBytes;
+};
+
+// **Interfejs danych**
 interface CertificateData {
   fullName: string;
   pesel: string;
@@ -16,23 +23,26 @@ interface CertificateData {
   gender: 'Pan' | 'Pani';
 }
 
-// **Funkcja generująca i pobierająca PDF**
+// **Funkcja generująca PDF**
 export const generatePDF = async (data: CertificateData) => {
   const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit); // Rejestracja fontkit dla obsługi niestandardowych czcionek
+  doc.registerFontkit(fontkit);
 
-  const page = doc.addPage([595, 842]); // Rozmiar A4 (595x842 px)
+  const page = doc.addPage([595, 842]); // Rozmiar A4
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-  // **Załadowanie czcionki Roboto**
+  // **Załadowanie czcionki**
   const fontBytes = await fetch(robotoFont).then(res => res.arrayBuffer());
   const customFont = await doc.embedFont(fontBytes);
 
   page.setFont(customFont);
   page.setFontSize(12);
 
-  // **Dodanie logotypu**
-  const logoImage = await doc.embedPng(logoBase64);
+  // **Załadowanie obrazu**
+  const logoBytes = await loadImage(logo);
+  const logoImage = await doc.embedPng(logoBytes);
+
+  // **Skalowanie obrazu**
   const imgWidth = 60;
   const aspectRatio = logoImage.width / logoImage.height;
   const imgHeight = imgWidth / aspectRatio;
@@ -75,13 +85,13 @@ export const generatePDF = async (data: CertificateData) => {
   const pdfBytes = await doc.save();
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
-  
+
   const a = document.createElement('a');
   a.href = url;
   a.download = `zaswiadczenie_${data.fullName.replace(/\s+/g, '_')}.pdf`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  
+
   URL.revokeObjectURL(url);
 };
