@@ -1,48 +1,8 @@
-import { Document, Page, Text, View, Image, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
-
-import logo from './logo.png'; // Import logo lokalnie
-import DejaVuSans from './DejaVuSans.ttf'; // Import czcionki obsługującej polskie znaki
-
-// Rejestracja czcionki, aby obsługiwała polskie znaki
-Font.register({
-  family: 'DejaVuSans',
-  src: DejaVuSans,
-});
-
-// Style dla PDF
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: 'DejaVuSans',
-  },
-  header: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  text: {
-    fontSize: 12,
-    marginBottom: 10,
-    textAlign: 'left',
-  },
-  signature: {
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  date: {
-    fontSize: 10,
-    textAlign: 'right',
-    marginBottom: 20,
-  },
-  logo: {
-    width: 60,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-});
+import logoBase64 from './logo.png'; // Import obrazka jako Base64
+import fs from 'fs/promises'; // Import systemu plików do ładowania czcionki (w Vite działa przez import)
 
 // Interfejs danych
 interface CertificateData {
@@ -54,56 +14,67 @@ interface CertificateData {
   gender: 'Pan' | 'Pani';
 }
 
-// Komponent PDF
-const CertificatePDF = ({ data }: { data: CertificateData }) => {
+// Funkcja generująca PDF
+export const generatePDF = async (data: CertificateData) => {
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([595, 842]); // Rozmiar A4 (595x842 px)
+
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Data w prawym górnym rogu */}
-        <Text style={styles.date}>Płock, {currentDate}</Text>
+  // **Załadowanie czcionki DejaVu Sans**
+  const fontBytes = await fs.readFile('./DejaVuSans.ttf');
+  const font = await doc.embedFont(fontBytes);
 
-        {/* Logo */}
-        <Image style={styles.logo} src={logo} />
+  page.setFont(font);
+  page.setFontSize(12);
 
-        {/* Nagłówek */}
-        <Text style={styles.header}>ZAŚWIADCZENIE</Text>
+  // **Dodanie logotypu**
+  const logoImage = await doc.embedPng(logoBase64);
+  const imgWidth = 60;
+  const imgHeight = imgWidth / (logoImage.width / logoImage.height);
+  page.drawImage(logoImage, {
+    x: (595 - imgWidth) / 2,
+    y: 780,
+    width: imgWidth,
+    height: imgHeight,
+  });
 
-        {/* Treść główna */}
-        <View>
-          <Text style={styles.text}>
-            Niniejszym zaświadczam, iż {data.gender} {data.fullName} (PESEL {data.pesel}) uczestniczył w {data.sessions} konsultacjach
-            psychoterapeutycznych w Centrum Obecności, w Płocku.
-          </Text>
-          <Text style={styles.text}>Sesje odbyły się w dniach: {data.sessionDates.join(', ')}.</Text>
-          <Text style={styles.text}>Ilość sesji odbytych: {data.sessions}</Text>
-          <Text style={styles.text}>Cena jednej sesji: {data.pricePerSession} zł</Text>
-          <Text style={styles.text}>Zaświadczenie wydaje się na bezpośrednią prośbę {data.gender} {data.fullName}.</Text>
-        </View>
+  // **Dodanie nagłówka i daty**
+  page.drawText(`Płock, ${currentDate}`, { x: 400, y: 810, size: 10, color: rgb(0, 0, 0) });
+  page.drawText('ZAŚWIADCZENIE', { x: 220, y: 750, size: 16, color: rgb(0, 0, 0) });
 
-        {/* Podpis terapeuty */}
-        <Text style={styles.signature}>
-          ........................................
-        </Text>
-        <Text style={styles.signature}>
-          Podpis terapeuty | Pieczęć ośrodka
-        </Text>
-      </Page>
-    </Document>
-  );
+  // **Treść certyfikatu**
+  const sessionDates = data.sessionDates.join(', ');
+  const content = [
+    `Niniejszym zaświadczam, iż ${data.gender} ${data.fullName} (PESEL ${data.pesel})`,
+    `uczestniczył w ${data.sessions} konsultacjach psychoterapeutycznych w Centrum Obecności, w Płocku.`,
+    "",
+    `Sesje odbyły się w dniach: ${sessionDates}.`,
+    `Ilość sesji odbytych: ${data.sessions}`,
+    `Cena jednej sesji: ${data.pricePerSession} zł`,
+    "",
+    `Zaświadczenie wydaje się na bezpośrednią prośbę ${data.gender} ${data.fullName}.`
+  ];
+
+  let y = 700;
+  content.forEach(line => {
+    page.drawText(line, { x: 50, y, size: 12, color: rgb(0, 0, 0) });
+    y -= 20;
+  });
+
+  // **Podpis i pieczęć**
+  page.drawText('........................................', { x: 220, y: 200, size: 12, color: rgb(0, 0, 0) });
+  page.drawText('Podpis terapeuty | Pieczęć ośrodka', { x: 190, y: 180, size: 12, color: rgb(0, 0, 0) });
+
+  // **Zapisanie i pobranie PDF**
+  const pdfBytes = await doc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `zaswiadczenie_${data.fullName.replace(/\s+/g, '_')}.pdf`;
+  a.click();
+  
+  URL.revokeObjectURL(url);
 };
-
-// Komponent przycisku do pobrania PDF
-const GeneratePDFButton = ({ data }: { data: CertificateData }) => {
-  return (
-    <PDFDownloadLink
-      document={<CertificatePDF data={data} />}
-      fileName={`zaswiadczenie_${data.fullName.replace(/\s+/g, '_')}.pdf`}
-    >
-      {({ loading }) => (loading ? 'Generowanie PDF...' : 'Pobierz Zaświadczenie')}
-    </PDFDownloadLink>
-  );
-};
-
-export default GeneratePDFButton;
