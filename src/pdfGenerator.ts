@@ -1,8 +1,9 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
+
 import logoBase64 from './logo.png'; // Import obrazka jako Base64
-import fs from 'fs/promises'; // Import systemu plików do ładowania czcionki (w Vite działa przez import)
+import robotoFont from './Roboto-Regular.ttf'; // Import czcionki
 
 // Interfejs danych
 interface CertificateData {
@@ -14,24 +15,25 @@ interface CertificateData {
   gender: 'Pan' | 'Pani';
 }
 
-// Funkcja generująca PDF
+// **Funkcja generująca i pobierająca PDF**
 export const generatePDF = async (data: CertificateData) => {
   const doc = await PDFDocument.create();
   const page = doc.addPage([595, 842]); // Rozmiar A4 (595x842 px)
-
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-  // **Załadowanie czcionki DejaVu Sans**
-  const fontBytes = await fs.readFile('./DejaVuSans.ttf');
-  const font = await doc.embedFont(fontBytes);
+  // **Załadowanie czcionki Roboto**
+  const fontBytes = await fetch(robotoFont).then(res => res.arrayBuffer());
+  const customFont = await doc.embedFont(fontBytes);
 
-  page.setFont(font);
+  page.setFont(customFont);
   page.setFontSize(12);
 
   // **Dodanie logotypu**
   const logoImage = await doc.embedPng(logoBase64);
   const imgWidth = 60;
-  const imgHeight = imgWidth / (logoImage.width / logoImage.height);
+  const aspectRatio = logoImage.width / logoImage.height;
+  const imgHeight = imgWidth / aspectRatio;
+
   page.drawImage(logoImage, {
     x: (595 - imgWidth) / 2,
     y: 780,
@@ -66,7 +68,7 @@ export const generatePDF = async (data: CertificateData) => {
   page.drawText('........................................', { x: 220, y: 200, size: 12, color: rgb(0, 0, 0) });
   page.drawText('Podpis terapeuty | Pieczęć ośrodka', { x: 190, y: 180, size: 12, color: rgb(0, 0, 0) });
 
-  // **Zapisanie i pobranie PDF**
+  // **Zapisanie i automatyczne pobranie PDF**
   const pdfBytes = await doc.save();
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
@@ -74,7 +76,9 @@ export const generatePDF = async (data: CertificateData) => {
   const a = document.createElement('a');
   a.href = url;
   a.download = `zaswiadczenie_${data.fullName.replace(/\s+/g, '_')}.pdf`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   
   URL.revokeObjectURL(url);
 };
