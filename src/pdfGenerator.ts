@@ -10,8 +10,7 @@ import logo from './logo.png'; // Importuj jako statyczny plik Vite
 // **Funkcja do dynamicznego ładowania obrazów**
 const loadImage = async (imagePath: string) => {
   const response = await fetch(imagePath);
-  const imageBytes = await response.arrayBuffer();
-  return imageBytes;
+  return response.arrayBuffer();
 };
 
 // **Interfejs danych**
@@ -32,11 +31,10 @@ export const generatePDF = async (data: CertificateData) => {
   const page = doc.addPage([595, 842]); // Rozmiar A4
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
-  // **Załadowanie czcionki**
+  // **Załadowanie czcionek**
   const fontBytes = await fetch(robotoFont).then(res => res.arrayBuffer());
   const customFont = await doc.embedFont(fontBytes);
 
-  // **Załadowanie pogrubionej czcionki**
   const boldFontBytes = await fetch(robotoBoldFont).then(res => res.arrayBuffer());
   const boldFont = await doc.embedFont(boldFontBytes);
 
@@ -47,23 +45,35 @@ export const generatePDF = async (data: CertificateData) => {
   const logoBytes = await loadImage(logo);
   const logoImage = await doc.embedPng(logoBytes);
 
-  // **Skalowanie obrazu**
-  const imgWidth = 260;
+  // **Skalowanie i centrowanie logo**
+  const imgWidth = 120;
   const aspectRatio = logoImage.width / logoImage.height;
   const imgHeight = imgWidth / aspectRatio;
+  const pageWidth = page.getWidth();
 
   page.drawImage(logoImage, {
-    x: (595 - imgWidth) / 2,
-    y: 780,
+    x: (pageWidth - imgWidth) / 2,
+    y: 730, // Umieszczone wyżej na stronie
     width: imgWidth,
     height: imgHeight,
   });
 
-  // **Dodanie nagłówka i daty**
-  page.drawText(`Płock, ${currentDate}`, { x: 400, y: 850, size: 10, color: rgb(0, 0, 0) });
-  page.drawText('ZAŚWIADCZENIE', { x: 220, y: 800, size: 16, color: rgb(0, 0, 0), font: boldFont });
+  // **Dodanie nagłówka**
+  page.setFont(boldFont);
+  page.setFontSize(20);
+  page.drawText('ZAŚWIADCZENIE', {
+    x: (pageWidth - boldFont.widthOfTextAtSize('ZAŚWIADCZENIE', 20)) / 2,
+    y: 660, // Przesunięcie w dół
+    color: rgb(0, 0, 0),
+  });
+
+  // **Dodanie daty po prawej stronie**
+  page.setFont(customFont);
+  page.setFontSize(10);
+  page.drawText(`Płock, ${currentDate}`, { x: 400, y: 780, color: rgb(0, 0, 0) });
 
   // **Treść certyfikatu**
+  page.setFontSize(12);
   const sessionDates = data.sessionDates.join(', ');
   const content = [
     `Niniejszym zaświadczam, iż ${data.gender} ${data.fullName} (PESEL ${data.pesel})`,
@@ -76,15 +86,15 @@ export const generatePDF = async (data: CertificateData) => {
     `Zaświadczenie wydaje się na bezpośrednią prośbę ${data.gender} ${data.fullName}.`
   ];
 
-  let y = 740;
+  let y = 600; // Środkowanie treści
   content.forEach(line => {
     page.drawText(line, { x: 50, y, size: 12, color: rgb(0, 0, 0) });
     y -= 20;
   });
 
-  // **Podpis i pieczęć**
-  page.drawText('........................................', { x: 220, y: 200, size: 12, color: rgb(0, 0, 0) });
-  page.drawText('Podpis terapeuty | Pieczęć ośrodka', { x: 190, y: 180, size: 12, color: rgb(0, 0, 0) });
+  // **Podpis i pieczęć na dole**
+  page.drawText('........................................', { x: 220, y: 150, size: 12, color: rgb(0, 0, 0) });
+  page.drawText('Podpis terapeuty | Pieczęć ośrodka', { x: 190, y: 130, size: 12, color: rgb(0, 0, 0) });
 
   // **Zapisanie i automatyczne pobranie PDF**
   const pdfBytes = await doc.save();
