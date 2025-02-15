@@ -1,4 +1,5 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit'; // Importujemy fontkit
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -18,6 +19,8 @@ interface CertificateData {
 // **Funkcja generująca i pobierająca PDF**
 export const generatePDF = async (data: CertificateData) => {
   const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit); // Rejestracja fontkit dla obsługi niestandardowych czcionek
+
   const page = doc.addPage([595, 842]); // Rozmiar A4 (595x842 px)
   const currentDate = format(new Date(), 'd MMMM yyyy', { locale: pl });
 
